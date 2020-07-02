@@ -122,8 +122,8 @@ Si los trazos de las pistas no aparecieran o algunas de las pistas aparecieran b
 <table>
 <tbody>
 <tr>
-<td><a href="/assets/pcb-design/Insolacion_resultado_01.jpg"><img src="/assets/pcb-design/Insolacion_resultado_01-580x416.jpg" alt="Insolacion_resultado_01" width="300" /></a></td>
-<td><a href="/assets/pcb-design/Insolacion_resultado_02.jpg"><img src="/assets/pcb-design/Insolacion_resultado_02-580x416.jpg" alt="Insolacion_resultado_02" width="300" /></a></td>
+<td><a href="/assets/pcb-design/Insolacion_resultado_01.jpg"><img src="/assets/pcb-design/insolacion_resultado_01-580x416.jpg" alt="Insolacion_resultado_01" width="300" /></a></td>
+<td><a href="/assets/pcb-design/Insolacion_resultado_02.jpg"><img src="/assets/pcb-design/insolacion_resultado_02-580x416.jpg" alt="Insolacion_resultado_02" width="300" /></a></td>
 </tr>
 </tbody>
 </table>
