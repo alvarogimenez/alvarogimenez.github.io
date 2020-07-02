@@ -1,0 +1,15 @@
+title: Álvaro Gómez Giménez
+email: gomez.gimenez.alvaro@gmail.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Mi nombre es Álvaro Gómez Giménez. Soy Ingeniero en Informática por la 
+  Escuela Politécnica Superior (UAM), pianista, arreglista y compositor.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "gomezgimenez.com" # the base hostname & protocol for your site, e.g. http://example.com
+github_username:  alvarogimenez
+
+# Build settings
+theme: minima
+show_excerpts: true
+plugins:
+  - jekyll-feed
+  
