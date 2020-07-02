@@ -301,8 +301,8 @@ A modo de resumen os dejo la comparativa del resultado de cada etapa del proceso
 <td><a href="/assets/pcb-design/Design_06.png"><img src="/assets/pcb-design/Design_06-580x376.png" alt="Design_06" width="300" /></a></td>
 </tr>
 <tr>
-<td><a href="/assets/pcb-design/Insolacion_resultado_01.jpg"><img  src="/assets/pcb-design/Insolacion_resultado_01-580x416.jpg" alt="Insolacion_resultado_01" width="300" /></a></td>
-<td><a href="/assets/pcb-design/Insolacion_resultado_02.jpg"><img src="/assets/pcb-design/Insolacion_resultado_02-580x416.jpg" alt="Insolacion_resultado_02" width="300" /></a></td>
+<td><a href="/assets/pcb-design/Insolacion_resultado_01.jpg"><img  src="/assets/pcb-design/insolacion_resultado_01-580x416.jpg" alt="Insolacion_resultado_01" width="300" /></a></td>
+<td><a href="/assets/pcb-design/Insolacion_resultado_02.jpg"><img src="/assets/pcb-design/insolacion_resultado_02-580x416.jpg" alt="Insolacion_resultado_02" width="300" /></a></td>
 </tr>
 <tr>
 <td><a href="/assets/pcb-design/Atacado_resultado_01.jpg"><img src="/assets/pcb-design/Atacado_resultado_01-580x416.jpg" alt="Atacado_resultado_01" width="300" /></a></td>
