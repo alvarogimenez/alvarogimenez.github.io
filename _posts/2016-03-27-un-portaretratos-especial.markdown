@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Motor Paso a Paso Lineal: Diseño e Implementación"
+title:  "Un portarretratos especial"
 date:   2016-03-27 00:01:35 +0200
 categories: electronica
 excerpt_separator: <!--more-->
