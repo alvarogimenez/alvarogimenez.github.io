@@ -1,0 +1,69 @@
+---
+layout: default
+---
+
+<div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
+
+  {% if site.paginate %}
+    {% assign posts = paginator.posts %}
+  {% else %}
+    {% assign posts = site.posts %}
+  {% endif %}
+
+
+  {%- if posts.size > 0 -%}
+    {%- if page.list_title -%}
+      <h2 class="post-list-heading">{{ page.list_title }}</h2>
+    {%- endif -%}
+    <ul class="post-list">
+      {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
+      {%- for post in posts -%}
+      <li>
+        <span class="post-meta">{{ post.date | date: date_format }}</span>
+        <h3>
+          <a class="post-link" href="{{ post.url | relative_url }}">
+            {{ post.title | escape }}
+          </a>
+        </h3>
+        {%- if site.show_excerpts -%}
+          {{ post.excerpt }}
+        {%- endif -%}
+      </li>
+      {%- endfor -%}
+    </ul>
+
+    {% if site.paginate %}
+      <!-- pagination -->
+      {% if paginator.total_pages > 1 %}
+      <div class="pagination">
+        {% if paginator.previous_page %}
+          <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&laquo; Anterior</a>
+        {% else %}
+          <span>&laquo; Anterior</span>
+        {% endif %}
+
+        {% for page in (1..paginator.total_pages) %}
+          {% if page == paginator.page %}
+            <span class="webjeda">{{ page }}</span>
+          {% elsif page == 1 %}
+            <a href="/">{{ page }}</a>
+          {% else %}
+            <a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if paginator.next_page %}
+          <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Siguiente &raquo;</a>
+        {% else %}
+          <span>Siguiente &raquo;</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    {%- endif %}
+
+  {%- endif -%}
+
+</div>
