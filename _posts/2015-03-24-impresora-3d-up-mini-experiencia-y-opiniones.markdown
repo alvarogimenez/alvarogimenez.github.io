@@ -2,7 +2,7 @@
 layout: post
 title:  "Impresora 3D Up! Mini: Experiencia y opiniones"
 date:   2015-03-24 00:01:35 +0200
-categories: electronica
+categories: modelismo
 excerpt_separator: <!--more-->
 ---
 
