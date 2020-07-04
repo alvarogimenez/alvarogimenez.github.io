@@ -9,6 +9,7 @@ github_username:  alvarogimenez
 
 # Build settings
 theme: minima
+google_analytics: UA-171640276-1
 show_excerpts: true
 paginate: 5
 paginate_path: /page/:num/
