@@ -7,11 +7,6 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "gomezgimenez.com" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  alvarogimenez
 
-markdown: kramdown
-kramdown: 
-  parse_block_html: true
-  parse_inline_html: true
-
 # Build settings
 theme: minima
 google_analytics: UA-171640276-1
