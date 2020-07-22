@@ -1,0 +1,700 @@
+---
+layout: post
+title:  "DIY: PCB con CNC 1610 y FlatCam"
+date:   2020-07-14 00:01:35 +0200
+categories: electronica
+excerpt_separator: <!--more-->
+# Low quality images in /assets/2020-07-15-pcb-con-cnc-1610/low (https://bulkresizephotos.com/)
+---
+
+<img 
+  align="left" 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/Main.jpg" 
+  alt="Main" 
+  width="280"
+/>
+La producción de PCB de forma casera es un arte moderno. Si bien es cierto que existen alternativas comerciales de prototipado a precios muy bajos (Aproximadamente 1€ por placa más gastos de envío desde china), poder realizar placas en cuestión de unas pocas horas y muy poco esfuerzo tiene un valor enorme para cualquier aficionado a la electrónica. 
+
+El artículo que hoy traigo es sobre construcción de PCB utilizando máquinas CNC compatibles con GRBL. Estas máquinas son bastante baratas (menos de 200€) y relativamente fáciles de configurar y controlar con software libre. El proceso utilizando este tipo de máquinas permite simplificar la producción de las PCB eliminando los procesos de insolación y revelado/atacado químico. Esta técnica reduce también el margen de error introducido por las imprecisiones en los fotolitos. 
+
+<!--more-->
+
+### Hardware necesario
+<table class="center-100">
+  <tr>
+    <td style="width: 35%">
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/HardwareCnc1610.jpeg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/HardwareCnc1610.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+    <b>CNC 1610:</b> En este artículo utilizaremos una CNC 1610 compatible con GRBL. Es la hermana pequeña de la CNC 3018 y tiene un precio similar con un tamaño reducido. La conectividad de este aparato es USB y no requiere de <i>drivers</i> adicionales. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/HardwareDrill.jpeg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/HardwareDrill.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+    <b>Fresas en V para PCB:</b> Utilizaremos fresas de carburo con forma de V fáciles de obtener en internet. Existen fresas de múltiples diámetros y ángulos. Cuanto mayor el ángulo y el diámetro de la punta más resistente será la fresa. Para este artículo he escogido las más precisas: 20 grados y 100 micras de diámetro.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/Holder.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/Holder.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+  <b>Guías de sujeción:</b> Existen múltiples formas de sujetar la placa a la superficie de aluminio de la CNC. En este artículo utilizaremos las piezas de fijación que pueden obtenerse <a href="https://www.thingiverse.com/thing:2455549">aquí</a>
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/HardwareAnycubic.jpeg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/HardwareAnycubic.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+      <b>Anycubic Photon (Opcional):</b> Utilizaremos la impresora 3D basada en la tecnología SLA, Anycubic Photon, para realizar el <i>soldermask</i> de la placa. Existen técnicas más sencillas (aunque menos precisas) que no requieren de esta herramienta. Más adelante veremos las alternativas. 
+    </td>
+  </tr>
+</table>
+
+### Software necesario
+
+<table class="center-100"  >
+  <tr>
+    <td style="width: 35%">
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/ToolsFlatCam.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/ToolsFlatCam.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+    <b>FlatCam 8.93:</b> Este es el software principal que utilizaremos para crear los ficheros G-Code con las instrucciones de aislamiento, taladro y mecanizado de la placa. Es una excelente herramienta  de software libre. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/ToolsCandle.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/ToolsCandle.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+    <b>Candle:</b> Con esta herramienta enviaremos las instrucciones G-Code generadas por <b>FlatCam</b> a la CNC 1610. Su manejo es muy sencillo y la interfaz permite previsualizar y seguir en directo el progreso del programa de corte. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/ToolsInkscape.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/ToolsInkscape.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+    <b>Inkscape (Opcional):</b> Utilizaremos este programa para preparar los perfiles de aislamiento de imagen para la máscara antisoldante. No será necesario si utilizamos algunas de las alternativas que propongo más adelante. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/ToolsTinkercad.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/ToolsTinkercad.jpg"
+        alt="Schematic" 
+        class="center" />
+      </a>
+    </td>
+    <td>
+    <b>Tinkercad (Opcional):</b> Con esta herramienta online generaremos los ficheros STL necesarios para poder exponer la máscara antisoldante con la Anycubic Photon. No será necesario utilizarla si seguimos alguna de las alternativas propuestas.  
+    </td>
+  </tr>
+</table>
+
+## Diseño de la placa
+La placa que vamos a construir en este artículo es un amplificador de audio con un filtro paso bajo a la entrada que permite procesar señales generadas con PWM desde un microcontrolador. No es el objetivo de esta entrada profundizar en el diseño eléctrico de la placa así que asumiremos que disponemos de los ficheros <i>Gerber</i> y <i>Excellon</i> correspondientes. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/Schematic.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/Schematic.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/PcbDesign.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/PcbDesign.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+A la hora de diseñar el trazado de la placa hay que tener en consideración algunos detalles:
+
+<ul>
+  <li>El <b>grosor mínimo de la pista</b> debe ser escogido al mayor posible. Este parámetro de diseño es una balanza entre la complejidad de la placa y los posibles problemas que puedan surgir a raíz de escoger valores demasiado pequeños. Como norma general no deberíamos utilizar pistas inferiores a las 6 milésimas de pulgada en métodos caseros. Para la placa de esta entrada emplearemos pistas de 12 milésimas de pulgada. En el último apartado de este artículo muestro pruebas con diferentes grosores de pista. </li>
+  <li>El <b>espacio entre pistas</b> también debe mantenerse al mayor posible. En general se debe evitar tener espacios entre pistas inferiores a las 8 milésimas de pulgada utilizando esta técnica si bien es posible reducir ese tamaño hasta las 6 milésimas de pulgada afinando los parámetros de mecanizado. Esto se explica mejor en el último apartado de este artículo. </li>
+</ul>
+
+
+## Mecanizado de aislamiento
+
+El primer paso para construir nuestra PCB es el aislamiento de pistas. Utilizando <b>FlatCam</b> vamos a generar código G-Code para eliminar el cobre que rodea a cada pista aislándola así del resto. En un <i>nuevo proyecto</i> de <b>FlatCam</b> importamos el fichero <i>Gerber</i> correspondiente al trazado de pistas de nuestra placa y seguimos los pasos que indico a continuación:
+
+<table>
+  <tr>
+    <td style="width: 45%">
+    <img 
+      src="/assets/2020-07-15-pcb-con-cnc-1610/low/HardwareVDrill.jpg" 
+      alt="Main" 
+      class="center-100"
+    />
+    </td>
+    <td>
+ Preparamos las fresas que vayamos a utilizar. Es importante conocer bien los parámetros de esta herramienta para poder configurar adecuadamente el software. Existen fresas más caras en el mercado que nos darán mejores resultados en cuanto a velocidad y durabilidad. He escogido fresas de 0.1mm y 20 grados porque son las más fáciles y baratas de conseguir. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <a href="/assets/2020-07-15-pcb-con-cnc-1610/F01-VShapeToolCalculator.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F01-VShapeToolCalculator.jpg"
+        alt="Schematic" 
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+ En <b>FlatCam</b> abrimos la herramienta de la calculadora. En esta herramienta hay un apartado específico para calcular el diámetro de corte de fresas con forma de V. Introduciendo el diámetro de la punta (100 micras en este caso), el ángulo de la fresa (20 grados) y la profundidad prevista de corte (100 micras para este ejemplo) obtenemos que el diámetro de corte en la superficie de corte será de 135.3 micras. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F02-IsolationConfig.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F02-IsolationConfig.jpg"
+        alt="Schematic" 
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+ Introducimos el diámetro obtenido en el apartado anterior en el apartado correspondiente del fichero Gerber correspondiente a las pistas de cobre e indicamos generar la geometría completa de aislamiento (<i>Generate Isolation Geometry</i>). 
+    </td>
+  </tr>
+</table>
+
+Una vez realizados los pasos anteriores <b>FlatCam</b> generará una geometría, que podemos visualizar en color rojo en el panel de la derecha. Esta geometría indica el camino que seguirá la fresa para aislar cada trazo de la placa. El objetivo ahora es generar las instrucciones G-Code en el espacio tridimensional para lo cual introducimos las variables que faltan: profundidad de corte (100 micras en este ejemplo), altura de desplazamiento entre cortes (500 micras) y corte en múltiples alturas (50 micras en este ejemplo). La selección de estos parámetros es bastante delicada y de ella <b>depende que la placa tenga defectos de aislamiento</b>. En el último apartado de este artículo muestro con detalle una comparativa con diferentes configuraciones de estas variables. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/F03-IsolationConfigGeom.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/F03-IsolationConfigGeom.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+Al generar el trabajo para la CNC a través del botón <i>Generate</i> del formulario anterior <b>FlatCam</b> crea un nuevo escenario con el camino exacto y el área de corte de la CNC que podemos ver en color azul en el panel de visualización. En este punto podemos guardar el código en un fichero que podrá ser directamente interpretado por <b>Candle</b>. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/F04-IsolationCncJob.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/F04-IsolationCncJob.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+### Preparado de la placa
+
+Antes de ejecutar el código de aislamiento debemos asegurar la placa en el soporte de la máquina CNC. Existen múltiples formas de asegurar la placa entre las que se encuentran utilizar un mártir de contrachapado o madera bajo la placa o emplear soportes de fijación lateral. En este artículo recurriremos a esta segunda opción con los soportes que indicaba al comienzo de la entrada. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/01-PcbSetup.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/01-PcbSetup.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+Es importante verificar que la placa se encuentra firmemente sujeta e inmóvil antes de comenzar el enrutado. De igual manera es importante verificar que el terminal de tierra de la prueba de altura se encuentra correctamente conectado al área de cobre de la placa. 
+
+### Prueba de altura
+
+Antes de comenzar el nivelado de la placa procedemos a fijar la fresa en el portabrocas de la CNC. Los portabrocas baratos tienden a no fijar la fresa de forma perfectamente vertical. Esto es un problema porque provoca que el eje del motor y el eje central de la fresa no estén alineados. Cuando se produce esta diferencia en los ejes la fresa vibra, aumentando su diámetro de corte y haciéndola mucho más propensa a fallar (roturas de la punta, delaminación, etc). Para fijar correctamente la fresa es necesario ajustar el portabrocas hasta ajustar casi por completo el vástago y girar la fresa levemente hasta que se acomode en la vertical correctamente para posteriormente terminar de apretar la cabeza del portabrocas. Vemos en el siguiente video un ejemplo de una fresa correctamente alineada (izquierda) y una fresa desalineada (derecha). 
+
+<video class="center" controls muted autoplay preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/Alignment.mp4" type="video/mp4">
+</video>
+
+Las placas tienen imperfecciones tales como curvaturas a lo largo y ancho de su superficie. También se producen desniveles durante la fijación de la placa a la base de la CNC. Es por ello que debemos ejecutar el autonivelado que ofrece <b>Candle</b> para que el enrutamiento se produzca a la altura relativa obtenida de restar el desnivel a la altura de cada punto en la placa. 
+
+Para realizar el nivelado de la placa abriremos el software <b>Candle</b> y cargaremos el fichero <i>G-Code</i> generado con <b>FlatCam</b> anteriormente. En el apartado <i>Mapa de alturas</i> configuramos los parámetros necesarios como se muestra en la siguiente imagen:
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/F05-CandleHeightMap.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/F05-CandleHeightMap.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+<b>Candle</b> calculará automáticamente el área en la que se debe realizar la prueba de nivelado pero es necesario indicar cuantos puntos en vertical y horizontal queremos que analice. No es necesario configurar una cantidad excesiva de puntos, con una matriz de 5x5 puntos es suficiente para placas de tamaño mediano. Vemos el proceso de autonivelado en el siguiente video:
+
+<video class="center" controls muted autoplay preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/Autolevel_crop.mp4" type="video/mp4">
+</video>
+
+### Aislamiento de pistas
+En este momento estamos en disposición de comenzar a aislar el cobre de las pistas. Para ello indicamos en <b>Candle</b> el comienzo de la operación con el botón <i>Empezar</i>. Vemos en el siguiente video el proceso, a cámara rápida, de aislamiento de las pistas. 
+
+<video class="center" controls muted preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/Isolate_crop.mp4" type="video/mp4">
+</video>
+
+### Taladros de alineación
+Para aplicar la máscara antisoldante en el próximo paso será necesario extraer la placa del soporte para posteriormente volverla a colocar para los taladros. Es necesario tener una referencia para volver a alinear la placa cuando la coloquemos ya que, de lo contrario, los taladros y el mecanizado del borde de la placa no coincidirán con las pistas enrutadas en el paso anterior. 
+
+En <b>FlatCam</b>, utilizando la herramienta de <i>PCB a doble cara</i>, indicamos los taladros de referencia escribiendo manualmente sus coordenadas. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/F05b-AlignmentDrillsConfig.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/F05b-AlignmentDrillsConfig.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+Cargamos el fichero de <i>G-Code</i> generado en el paso anterior en <b>Candle</b> y cambiamos la fresa por una broca de 1mm de diámetro. Vemos en el siguiente video el proceso de taladrado de los agujeros de referencia. 
+
+<video class="center" controls muted autoplay preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/AlignmentDrills_crop.mp4" type="video/mp4">
+</video>
+
+Una vez realizados los taladros de referencia podemos extraer la placa de la superficie de corte para prepararla para el siguiente paso. Con un cepillo de dientes limpiamos bien el cobre que queda entre las pistas resultado de las rebabas producidas por la fresa. Este paso es importante porque es frecuente que queden rebabas de cobre conectando dos pistas y se eliminan fácilmente con un cepillo de dientes o brocha. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/03-PcbClean.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/03-PcbClean.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+En este punto debemos realizar una inspección visual de la placa (a contraluz a ser posible) para detectar posibles áreas del cobre que se hayan eliminado de más o de menos. En caso de haberse eliminado de menos se puede reparar utilizando un cutter. 
+
+## Máscara antisoldante (Soldermask)
+
+La máscara antisoldante, o <i>Soldermask</i> en inglés, es una parte opcional pero muy útil en una PCB. Como su propio nombre indica evita que el estaño ocupe más margen que el que le permita la máscara evitando así puentes en soldaduras complicadas como SMD. Además hace muchísimo más fácil la soldadura en caso de que soldemos con aire. 
+
+Existen varios métodos para aplicar la máscara antisoldante. En esta entrada voy a utilizar pintura curable por luz ultravioleta, fácil de obtener en internet, y una impresora 3D SLA para curar la resina. Obviamente no todo el mundo tiene esta tecnología disponible así que en <a href="/electronica/2018/07/08/diy-construir-pcb-a-doble-cara-con-solder-mask.html">en esta otra entrada</a> hay una alternativa utilizando fotolitos con papel vegetal. 
+
+El primer paso para crear la máscar antisoldante es preparar el perfil de insolación. La pintura ultravioleta se cura en contacto con longitudes de onda por debajo de los 400nm por lo que deberemos exponer únicamente la pintura que queramos curar y dejar los pads a oscuras. Importaremos los ficheros <i>Gerber</i> correspondientes al <i>Soldermask</i> en <b>FlatCam</b> y seguiremos los siguientes pasos:
+
+
+<table class="center">
+  <tr>
+    <td style="width: 45%;">
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F06-SoldermaskFlatcamSvg.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F06-SoldermaskFlatcamSvg.jpg"
+        alt="Schematic"
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+A través de <b>FlatCam</b> exportamos el <i>Gerber</i> de la máscara antisoldante en positivo a un fichero SVG. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F07-SoldermaskInkscape.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F07-SoldermaskInkscape.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+En <b>Inkscape</b> importamos el fichero SVG anterior y creamos un rectángulo opaco del mismo tamaño que el contorno del SVG anterior. Lo llevamos al fondo para que sea fácil de manipular. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F08-SoldermaskInkscapeExclusion.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F08-SoldermaskInkscapeExclusion.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Seleccionamos todos los trazos de la máscara y el rectángulo que hemos creado y hacemos click en <i>Trayecto -> Exlusión </i> para generar un negativo de la máscara. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F09-InkscapeFinal.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F09-InkscapeFinal.jpg"
+        alt="Schematic"
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+    Exportamos el negativo de la máscara nuevamente a SVG para poder convertirlo a STL posteriormente. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F10-TinkercadImport.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F10-TinkercadImport.jpg"
+        alt="Schematic"
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+    En <b>Tinkercad</b> creamos un nuevo proyecto e importamos el SVG. Las medidas de la placa se deberían calcular correctamente porque <b>FlatCam</b> las indica al exportarlo; de lo contrario, corregimos el ancho/alto de la placa. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F11-TinkercadFinal.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F11-TinkercadFinal.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Exportamos el modelo 3D en negativo a un fichero STL. Las partes altas se expondrán a luz UV mientras que las partes a altura cero quedarán opacas, quedando los <i>pads</i> sin curar. 
+    </td>
+  </tr>
+</table>
+
+### Máscara UV
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/04-PcbSoldermask1.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/04-PcbSoldermask1.jpg"
+  alt="Schematic" 
+  width="300"
+  align="left" />
+</a>
+Existen múltiples pinturas curables por luz ultravioleta en internet a precios muy asequibles. Para este artículo utilizaremos pintura de color azul que tarda en curar unos 5 minutos siendo expuesta a la luz de 405nm de la Anycubic Photon. Este proceso puede realizarse con cualquier impresora 3D que utilice tecnología SLA. 
+
+Antes de extender la resina es importante tapar los agujeros con pequeños trozos de celo para que queden transparentes y utilizar una lámina de algunos de los materiales que comento en <a href="/electronica/2018/07/08/diy-construir-pcb-a-doble-cara-con-solder-mask.html">esta entrada</a> para que la pintura se distribuya uniformemente. Para este artículo utilizaremos láminas de polipropileno transparentes de 100 micras de grosor. Podemos extender la pintura ayudándonos de una tarjeta de crédito asegurándonos de que todas las zonas tengan la misma cantidad. A continuación muestro algunas imágenes de este proceso: 
+
+<table class="center">
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/05-PcbSoldermask2.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/05-PcbSoldermask2.jpg"
+        alt="Schematic"
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/06-PcbSoldermask3.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/06-PcbSoldermask3.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/07-PcbSoldermask4.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/07-PcbSoldermask4.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/08-PcbSoldermask5.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/08-PcbSoldermask5.jpg"
+        alt="Schematic"
+        class="center-100" />
+      </a>
+    </td>
+  </tr>
+</table>
+
+Las impresoras 3D con tecnología SLA utilizan una pantalla LCD para exponer a la luz ultravioleta las capas del modelo que se quera imprimir. Si enviamos el fichero STL que hemos obtenido en el paso anterior podemos ver como todas las partes que queremos curar de la máscara antisoldante quedan expuestas a la luz ultravioleta. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/09-PcbAnycubic1.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/09-PcbAnycubic1.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+Para alinear la placa repetiremos el proceso de conversión SVG/STL anterior con los agujeros de alineación que hemos taladrado en la placa. Al enviar este fichero con los cuatro agujeros extruidos a la impresora veremos cuatro circulos en el LCD con los que podremos alinear la placa. 
+
+<table>
+  <tr>
+    <td style="width: 45%">
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/10-PcbAnycubic2.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/10-PcbAnycubic2.jpg"
+        alt="Schematic" 
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+    Aplicamos presión con un objeto pesado sobre la placa para evitar que se mueva o separe del LCD y mandamos el fichero STL de la máscara obtenido al comienzo para curarla durante 5 minutos. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/11-PcbSoldermaskFilmRemove.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/11-PcbSoldermaskFilmRemove.jpg"
+        alt="Schematic" 
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+    Separamos con cuidado la lámina de polipropileno. Las partes no expuestas quedan líquidas y adheridas a la lámina. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/12-PcbSoldermaskFinish.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/12-PcbSoldermaskFinish.jpg"
+        alt="Schematic" 
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+    Limpiamos la placa con alcohol con cuidado de no levantar la pintura que aún puede estar algo delicada. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/13-PcbSoldermaskUV.jpg" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/13-PcbSoldermaskUV.jpg"
+        alt="Schematic" 
+        class="center-100" />
+      </a>
+    </td>
+    <td>
+    Terminamos de curar la pintura utilizando cualquier fuende de luz ultravioleta hasta que esté completamente seca al tacto. 
+    </td>
+  </tr>
+</table>
+
+## Agujero pasante y mecanizado de borde
+
+En este punto volvemos a colocar la placa en los soportes de la CNC y cargamos el fichero G-Code de los agujeros de alineación. Ajustamos la placa, ayudándonos de cada agujero de alineación, para que al posicionar la CNC en cada uno de los puntos el espacio virtual y el físico coincidan. 
+
+Para taladrar la placa cargamos el fichero <i>Excellon</i> correspondiente a los agujeros en <b>FlatCam</b> y seguimos los pasos que muestro a continuación: 
+
+<table>
+  <tr>
+    <td style="width: 45%;">
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F12-MillHoles.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F12-MillHoles.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Para no hacer cambio de herramienta seleccionaremos <i>Mill Drills</i>. Con esta opción podremos hacer todos los taladros con una broca de 0.7mm y la CNC se encargará de ahuecar los taladros que sean de diámetro superior. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F13-MillHolesCncJob.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F13-MillHolesCncJob.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Tras configurar la altura de corte (2.5mm porque la placa tiene margen de sobra por los soportes) exportamos el código G-Code para poder importarlo en <b>Candle</b>
+    </td>
+  </tr>
+</table>
+
+<video class="center" controls muted autoplay preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/Drill_crop.mp4" type="video/mp4">
+</video>
+
+<table>
+  <tr>
+    <td style="width: 45%;">
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F14-CutoutToolConfig.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F14-CutoutToolConfig.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Abrimos la herramienta de <i>Board cutout</i> en <b>FlatCam</b> e indicamos los parámetros de mecanizado del borde de la placa. En este artículo dejaremos dos solapas de 1mm a cada lado de la placa. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F15-CutoutGeomConfig.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F15-CutoutGeomConfig.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Seleccionamos la profundidad de corte y la velocidad de corte. Conviene no pasarse en la velocidad para no levantar la pintura de la máscara antisoldante. 
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="/assets/2020-07-15-pcb-con-cnc-1610/F16-CutoutCncJob.png" >
+      <img 
+        src="/assets/2020-07-15-pcb-con-cnc-1610/low/F16-CutoutCncJob.jpg"
+        alt="Schematic" 
+        class="center-100"/>
+      </a>
+    </td>
+    <td>
+    Exportamos el G-Code y lo importamos en <b>Candle</b> para proceder al mecanizado del borde de la placa. 
+    </td>
+  </tr>
+</table>
+
+<video class="center" controls muted autoplay preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/Mechanical_crop.mp4" type="video/mp4">
+</video>
+
+Es importante no excederse en las velocidades horizontal o vertical. Mi recomendación es escoger valores relativamente pequeños (tómese como referencia los de este artículo) e ir experimentando. Cuanto más altos son los valores de la velocidad de la máquina más riesgo corremos de partir las brocas, desplazar la placa del soporte, etc. A continuación muestro como queda la placa tras el mecanizado del borde.
+
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/14-PcbSoldermaskMechanical.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/14-PcbSoldermaskMechanical.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/15-PcbMechanicalRemove.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/15-PcbMechanicalRemove.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+## Acabado y soldadura
+
+Los resultados obtenidos con esta técnica son sorprendentes. Ahorrarse todo el proceso químico es algo que invita a realizar prototipos con más frecuencia. Llevo muchos años haciendo PCB con el método de la insolación/revelado/atacado y conozco de primera mano lo engorrosos que son todos los procedimientos. Con esta técnica el proceso es casi desatendido y la precisión igual o mejor que con el método químico. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/16-PcbComplete.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/16-PcbComplete.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+A continuación muestro algunas comparativas al microscopio de la placa con su modelo original en <b>Proteus</b>. Estas imagenes fueron tomadas antes de aplicar la máscara antisoldante para que se aprecie mejor cada corte.
+
+<video class="center" controls muted preload loop>
+  <source src="/assets/2020-07-15-pcb-con-cnc-1610/Detail_crop.mp4" type="video/mp4">
+</video>
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/PcbComparison.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/PcbComparison.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+El último paso (y creo que el más divertido) es soldar los componentes. Yo utilizo una estación de soldadura por aire caliente en combinación con pasta para soldar de baja temperatura. La máscara antisoldante juega aquí un papel fundamental. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/17-SolderComponents.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/17-SolderComponents.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+A continuación muestro imágenes de la placa terminada. Es increíble el resultado que se puede obtener con una máquina que no llega a los 200€ y software libre. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/18-PcbSolderTop.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/18-PcbSolderTop.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/19-PcbSolderBottom.jpg" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/19-PcbSolderBottom.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+
+## Profundidad de corte
+
+El mayor quebradero de cabeza de esta técnica de construcción de PCBs es seleccionar la profundidad de corte. Al utilizar una herramienta con forma de V tendremos un mayor diámetro de corte cuanto mayor sea la profundidad. Además esa profundidad depende del ángulo de la fresa, cuanto más ángulo, más diámetro con la misma profundidad. 
+
+De cara a entender mejor cómo afecta la profundidad de corte al aislamiento de las pistas he hecho una placa de prueba que muestro a contiuación. La placa tiene pistas de diferentes grosores desde 6 milésimas de pulgada a 15 milésimas de pulgada. También tiene una zona con pistas de grosor fijo separados por diferentes distancias. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/TestPcb.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/TestPcb.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+Al realizar los cálculos de los diámetros de corte el único tramo teóricamente afectado es el de separación de 6 milésimas de pulgada con una profundidad de corte de 150 micras. Esto es debido a que a esa profundidad la fresa cortará a un grosor superior al del espacio entre pistas y <b>FlatCam</b> decidirá no trazar una geometría por ese lugar. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/SpaceTestPcbAnotated.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/SpaceTestPcbAnotated.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+A continuación podemos observar las diferencias en el aislamiento de las rutas en función de la profundidad de enrutado. Como se puede observar, a una profundidad de 50 micras se elimina todo el cobre (cuyo espesor en la placa es de 35 micras) pero quedan rebabas en los laterales de cada pista. A una profundidad de 100 micras el corte es de mayor calidad siendo con 150 micras casi perfecto. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/TraceAnotated.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/TraceAnotated.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+El escenario con el espacio entre pistas es algo diferente. Obviamente cuanto menor es la profundidad de corte menor será el espacio posible entre pistas. Como se observa con una profundidad de 50 micras el espacio entre pistas respeta bastante el modelo original mientras que con 150 micras de profundidad de corte el espacio de 6 milésimas de pulgada no se puede trazar por un exceso en el diámetro de corte. 
+
+<a href="/assets/2020-07-15-pcb-con-cnc-1610/SpaceAnotated.png" >
+<img 
+  src="/assets/2020-07-15-pcb-con-cnc-1610/low/SpaceAnotated.jpg"
+  alt="Schematic" 
+  class="center" />
+</a>
+
+Como conclusión, una profundidad de corte de 100 micras con una fresa de 20 grados y punta de 100 micras es una buena balanza entre un acabado suave de las pistas y unas posibilidades de calidad semiprofesional. La mayoría de fabricantes de prototipos de placas establece el estándar (antes de escalar a rangos de precio mayores) a 6 milésimas de pulgada para espacio mínimo entre pistas y grosor mínimo de pista. 
+
+
