@@ -58,3 +58,12 @@ table td {
      margin-top: 10px;
      margin-bottom: 10px;
  }
+
+ pre {
+     background-color: inherit;
+     border: none;
+ }
+
+ pre code {
+     margin-top: -20px;
+ }
