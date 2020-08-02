@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Construyendo una caja de música"
-date:   2020-08-10
+date:   2020-08-02
 categories: electronica
 excerpt_separator: <!--more-->
 hidden: true
