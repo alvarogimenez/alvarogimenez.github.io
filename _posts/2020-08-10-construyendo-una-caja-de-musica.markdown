@@ -4,7 +4,6 @@ title:  "Construyendo una caja de música"
 date:   2020-08-02
 categories: electronica
 excerpt_separator: <!--more-->
-hidden: true
 # Low quality images in /assets/2020-08-10-construyendo-una-caja-de-musica/low (https://bulkresizephotos.com/)
 ---
 
