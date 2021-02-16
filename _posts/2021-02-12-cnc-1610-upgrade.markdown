@@ -1,0 +1,563 @@
+---
+layout: post
+title:  "Actualización de una CNC 1610 para producción de PCBs"
+date:   2021-02-12
+categories: electronica
+excerpt_separator: <!--more-->
+# Low quality images in /assets/2021-02-12-cnc-1610-upgrade/low (https://bulkresizephotos.com/)
+---
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/main.jpg" >
+<img 
+  align="left" 
+  src="/assets/2021-02-12-cnc-1610-upgrade/low/main.jpg" 
+  alt="Main" 
+  width="280"
+/>
+</a>
+
+Las máquinas CNC son una excelente herramienta para la producción de PCBs como veíamos <a href="/electronica/2020/07/13/pcb-con-cnc-1610.html">en este artículo.</a> Sin embargo, para poder trabajar con comodidad son necesarias ciertas mejoras que facilitan las tareas más comunes como desplazar manualmente el cabezal, intercambiar la salida de potencia entre el taladro y el láser, etc.
+
+En este artículo vamos a realizar una serie de mejoras en una CNC 1610 genérica compatible con GRBL que incluyen: un panel de control para manejar diferentes herramientas, un cabezal multifunción con luz integrada y un láser de 20W; interruptores de fin de carrera y una extensión del panel trasero con refrigeración y un panel de cableado. 
+
+<!--more-->
+
+### Cómo actualizar la CNC
+
+En el siguiente vídeo muestro el proceso completo de actualización de la CNC con todos los pasos a seguir. Más adelante en este artículo vamos a explorar todos los ficheros necesarios y los detalles de configuración de la máquina. 
+
+<iframe class="center" width="560" height="400" style="margin-bottom:15px;" src="https://www.youtube.com/embed/zMv2omSqS4E" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
+### Panel de Control
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/ControlPanel.jpg" >
+<img 
+  align="left" 
+  src="/assets/2021-02-12-cnc-1610-upgrade/low/ControlPanel.jpg" 
+  alt="Main" 
+  width="280"
+/>
+</a>
+
+El Panel de Control que vamos a construir tiene múltiples funciones. En primer lugar lo utilizaremos para controlar de forma manual la CNC. Para esto tiene un control de movimiento en todas las direcciones (X, Y & Z), un control de rotación del husillo y un selector de paso (para configurar la distancia de desplazamiento). 
+
+También podremos controlar la luz integrada en el cabezal y seleccionar si derivamos la potencia al motor o al láser de 20W del que hablaremos más adelante. Esto último será especialmente útil en la producción de PCBs ya que es habitual cambiar con mucha frecuencia entre estas dos herramientas. Por último, un botón de parada de emergencia nos permitirá abortar cualquier operación en caso de riesgo o fallo. 
+
+Para comenzar es necesario imprimir el armazón del Panel de Control. A continuación se pueden descargar los dos ficheros _.stl_ correspondientes:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/Thumb_ControlPanelFront.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/Thumb_ControlPanelFront.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/ControlPanelFront.stl">ControlPanelFront.stl</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/Thumb_ControlPanelRear.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/Thumb_ControlPanelRear.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/ControlPanelRear.stl">ControlPanelRear.stl</a>
+        </td>
+    </tr>
+</table>
+
+Tras imprimir las piezas del Panel de Control veamos las especificaciones de todos los interruptores y pulsadores necesarios:
+
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/ControlPanelAssembly.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/ControlPanelAssembly.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/Dimensions_StopM22.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/Dimensions_StopM22.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/Dimensions_Selector3.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/Dimensions_Selector3.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/Dimensions_ButtonM16.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/Dimensions_ButtonM16.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/Dimensions_DPDT_Switch.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/Dimensions_DPDT_Switch.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+Los pulsadores de control irán conectados a un Arduino Pro Micro que servirá de interfaz con el software _Candle_. Los interruptores de parada, derivación de potencia (Motor/Láser) y control de la luz irán conectados al panel de extensión que veremos más adelante. A continuación se muestra un diagrama de conexiones y cableado de los componentes:
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/Schematic.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/Schematic.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+El _Firmware_ de la placa que servirá como controlador del software _Candle_ se muestra a continuación:
+
+<pre style="max-height:500px;">
+    <code class="cpp">#include &lt;Keyboard.h&gt;
+
+#define R_CTRL_FEED_UP 3
+#define R_CTRL_FEED_DOWN 2
+
+#define R_CTRL_UP 8
+#define R_CTRL_LEFT 6
+#define R_CTRL_RIGHT 7
+#define R_CTRL_DOWN 5
+#define R_CTRL_Z_UP 15
+#define R_CTRL_Z_DOWN 16
+#define R_CTRL_SPINDLE 14
+
+int wValue = 1;
+
+int r_ctrl_feed_up = 1;
+int r_ctrl_feed_down = 1;
+int r_ctrl_up = 1;
+int r_ctrl_left = 1;
+int r_ctrl_right = 1;
+int r_ctrl_down = 1;
+int r_ctrl_z_up = 1;
+int r_ctrl_z_down = 1;
+int r_ctrl_spindle = 1;
+
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  pinMode(R_CTRL_FEED_UP, INPUT_PULLUP);
+  pinMode(R_CTRL_FEED_DOWN, INPUT_PULLUP);
+  pinMode(R_CTRL_UP, INPUT_PULLUP);
+  pinMode(R_CTRL_LEFT, INPUT_PULLUP);
+  pinMode(R_CTRL_RIGHT, INPUT_PULLUP);
+  pinMode(R_CTRL_DOWN, INPUT_PULLUP);
+  pinMode(R_CTRL_Z_UP, INPUT_PULLUP);
+  pinMode(R_CTRL_Z_DOWN, INPUT_PULLUP);
+  pinMode(R_CTRL_SPINDLE, INPUT_PULLUP);
+  Keyboard.begin();
+}
+
+void checkButton(int pin, int &last_value, void (*callbackStart)(), void (*callbackEnd)()) {
+  int new_value = digitalRead(pin);
+  if(new_value != last_value) {
+    last_value = new_value;
+    if(last_value == 0) {
+      led(1);
+      callbackStart();
+    } else {
+      led(0);
+      callbackEnd();
+    }
+  }
+}
+
+void led(int value) {
+  digitalWrite(LED_BUILTIN, value);
+}
+
+void loop() {
+  checkButton(R_CTRL_FEED_UP,    r_ctrl_feed_up,    []() { Keyboard.press('1'); }, []() { Keyboard.release('1'); });
+  checkButton(R_CTRL_FEED_DOWN,  r_ctrl_feed_down,  []() { Keyboard.press('7'); }, []() { Keyboard.release('7'); });
+
+  checkButton(R_CTRL_UP,         r_ctrl_up,         []() { Keyboard.press('2'); }, []() { Keyboard.release('2'); });
+  checkButton(R_CTRL_LEFT,       r_ctrl_left,       []() { Keyboard.press('4'); }, []() { Keyboard.release('4'); });
+  checkButton(R_CTRL_RIGHT,      r_ctrl_right,      []() { Keyboard.press('6'); }, []() { Keyboard.release('6'); });
+  checkButton(R_CTRL_DOWN,       r_ctrl_down,       []() { Keyboard.press('8'); }, []() { Keyboard.release('8'); });
+
+  checkButton(R_CTRL_Z_UP,       r_ctrl_z_up,       []() { Keyboard.press('9'); }, []() { Keyboard.release('9'); });
+  checkButton(R_CTRL_Z_DOWN,     r_ctrl_z_down,     []() { Keyboard.press('3'); }, []() { Keyboard.release('3'); });
+
+  checkButton(R_CTRL_SPINDLE,    r_ctrl_spindle,    []() { Keyboard.press('0'); }, []() { Keyboard.release('0'); });
+}
+    </code>
+</pre>
+
+Tras instalar el _Firmware_ y conectar via USB el Panel de Control al ordenador deberíamos poder controlar el software _Candle_ siempre y cuando esté marcada la opción "Control desde teclado". 
+
+### Cabezal Multifunción
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/Header.jpg" >
+<img 
+  align="left" 
+  src="/assets/2021-02-12-cnc-1610-upgrade/low/Header.jpg" 
+  alt="Main" 
+  width="280"
+/>
+</a>
+
+En este cabezal vamos a incorporar varias funcionalidades: un láser de 20W, una placa de LED integrada y los interruptores de fin de carrera de los ejes X y Z. 
+
+El láser de 20W es una herramienta muy útil en la producción de PCBs dado que se utiliza para crear la máscara antisoldante y la serigrafía de componentes. Además añadirá la funcionalidad de grabado a la CNC en adición al proceso de manufactura sustractiva. 
+
+La placa de LED va a servir para iluminar adecuadamente el área de trabajo. Esto ayudará durante las labores de mantenimiento, alineamiento, limpieza. etc. Los interruptores de fin de carrera indicarán a la máquina cuál es el orígen de coordenadas y cual es la frontera de movimiento máximo sin dañar el mecanismo. Veremos cómo configurarlos más adelante en este mismo artículo. 
+
+El primer paso para instalar el cabezal es imprimir las piezas que listo a continuación:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/Thumb_HeaderA.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/Thumb_HeaderA.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/HeaderA.stl">HeaderA.stl</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/Thumb_HeaderB.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/Thumb_HeaderB.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/HeaderB.stl">HeaderB.stl</a>
+        </td>
+    </tr>
+</table>
+
+Antes de ensamblar el cabezal en la máquina como se muestra en el video al comienzo de esta entrada es necesario construir la placa de iluminación. Esta placa está compuesta por 16 diodos LED blancos con un salto de voltaje de 3V. Estos LEDs están dispuesto en grupos de cuatro en serie, lo cual permite que la placa sea alimentada con la salida de 12V del panel trasero principal de la CNC. A continuación se pueden descargar todos los ficheros Gerber y Excellon de la placa:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_3D.jpg" >
+            <img 
+            src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_3D.jpg"
+            alt="Schematic" 
+            class="center-100" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_3D_Board.jpg" >
+            <img 
+            src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_3D_Board.jpg"
+            alt="Schematic" 
+            class="center-100" />
+            </a>
+        </td>
+    </tr>
+</table>
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_TopCopper.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_TopCopper.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/LedBoard - CADCAM Top Copper.GBR">LedBoard - CADCAM Top Copper.GBR</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_TopSilk.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_TopSilk.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/LedBoard - CADCAM Top Silk Screen.GBR">LedBoard - CADCAM Top Silk Screen.GBR</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_TopSolderResist.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_TopSolderResist.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/LedBoard - CADCAM Top Solder Resist.GBR">LedBoard - CADCAM Top Solder Resist.GBR</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_Drill.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_Drill.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/LedBoard - CADCAM Drill.DRL">LedBoard - CADCAM Drill.DRL</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/LedBoard_Thumb_Mechanical.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/LedBoard_Thumb_Mechanical.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/LedBoard - CADCAM Mechanical 1.GBR">LedBoard - CADCAM Mechanical 1.GBR</a>
+        </td>
+    </tr>
+</table>
+
+### Interruptores de fin de carrera
+
+Es necesario incluir interruptores de final de carrera por dos motivos: poder mantener referencias a un punto absoluto en el espacio de trabajo entre dos sesiones y prevenir a la máquina de dañarse en caso de dar una instrucción de movimiento que sobrepase el límite de alguno de los ejes. A continuación se muestra un diagrama simple de la conexión de los interruptores de fin de carrera a la placa de extensión (La extensión es un _bypass_ directo a sus correspondientes puertos en la placa de la CNC):
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/EndSwitches.jpg" >
+<img 
+  class="center" 
+  src="/assets/2021-02-12-cnc-1610-upgrade/low/EndSwitches.jpg" 
+  alt="Main" 
+  width="280"
+/>
+</a>
+
+Tras proceder a instalar los interruptores como se indica en el video al comienzo de este artículo es necesario configurar la máquina a través del siguiente código GRBL:
+
+
+<pre style="max-height:500px;">
+    <code class="grbl">
+(Disable Soft Limits)
+$20=0
+(Enable Hard Limits)
+$21=1
+(Enable Homing Cycle)
+$22=1
+(Default Homing direction mask)
+$23=0
+    </code>
+</pre>
+
+### Sonda de altura
+
+La sonda de altura es imprescindible en la producción de PCBs dado que la profundidad de mecanizado es muy pequeña (normalmente inferior a las 150 micras) y la variación de altura en diferentes puntos de la placa puede provocar exceso o defecto de profundización de la fresa. 
+
+Para colocar la sonda de altura debemos conectar dos cables con un acabado en pinza a diferentes partes de la máquina. Uno de los cables puede ir conectado al chasis del motor ya que este tiene conectividad directa con el eje y, por tanto, con la broca o fresa. El otro cable de la sonda lo conectaremos directamente a la placa de cobre como se puede apreciar en las siguientes imágenes:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/ZProbeA.jpg" >
+            <img 
+            src="/assets/2021-02-12-cnc-1610-upgrade/low/ZProbeA.jpg"
+            alt="Schematic" 
+            class="center-100" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/ZProbeB.jpg" >
+            <img 
+            src="/assets/2021-02-12-cnc-1610-upgrade/low/ZProbeB.jpg"
+            alt="Schematic" 
+            class="center-100" />
+            </a>
+        </td>
+    </tr>
+</table>
+
+Los dos cables irán conectados al correspondiente terminal en la placa de cableado que veremos más adelante. Esta placa de cableado realiza un _bypass_ directo de estas dos conexiones a la tierra (GND) de la placa base y al terminal de conexión A5 (Z-Probe). 
+
+### Extensión del panel trasero
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/RearPanel.jpg" >
+<img 
+  align="left" 
+  src="/assets/2021-02-12-cnc-1610-upgrade/low/RearPanel.jpg" 
+  alt="Main" 
+  width="280"
+/>
+</a>
+
+La placa base sobre la que vamos a trabajar es una Woodpecker 3.2. Cada máquina CNC tiene una placa base diferente aunque la mayoría disponen de los mismos puertos de extensión que generalmente incluyen: conectores para los interruptores de fin de carrera, conector para la prueba de altura, conector para reiniciar la placa. 
+
+La extensión del panel trasero comprende varias funcionalidades. En primer lugar dispone de dos ventiladores estándar de 40mm y 12V que permitirán refrigerar los componentes principales de la placa base de la CNC. Los componentes que más se calientan son: los controladores de los motores paso a paso, los reguladores de tensión con salidas a 12V (utilizado por el módulo láser y todos los componentes a 12V) y el transistor que controla el flujo del PWM hacia el husillo. 
+
+Además de la refrigeración he diseñado un panel de cableado para facilitar la conexión entre los diferentes componentes instalados previamente y la placa base de la CNC. Como he mencionado anteriormente este panel de cableado está especialmente diseñado para la Woodpecker 3.2. Otra placa base de la CNC requeriría de diseño adicional. 
+
+El primer paso para instalar la extensión es imprimir la cubierta. Se pueden descargar los ficheros _.stl_ a continuación:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/Thumb_RearCover.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/Thumb_RearCover.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/RearCover.stl">RearCover.stl</a>
+        </td>
+    </tr>
+</table>
+
+La placa de cableado nos va a permitir organizar con más facilidad los cables. Esta placa tiene conexiones directas con los puertos de extensión de la placa base y, además, conecta los interruptores del panel de control a sus respectivas herramientas (el motor, el láser y la luz integrada). A continuación se pueden descargar todos los ficheros necesarios para construir la placa:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_3D_Full.jpg" >
+            <img 
+            src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_3D_Full.jpg"
+            alt="Schematic" 
+            class="center-100" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_3D_Board.jpg" >
+            <img 
+            src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_3D_Board.jpg"
+            alt="Schematic" 
+            class="center-100" />
+            </a>
+        </td>
+    </tr>
+</table>
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_TopCopper.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_TopCopper.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Top Copper.GBR">WiringBoard - CADCAM Top Copper.GBR</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_BottomCopper.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_BottomCopper.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Bottom Copper.GBR">WiringBoard - CADCAM Bottom Copper.GBR</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_TopSilk.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_TopSilk.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Top Silk Screen.GBR">WiringBoard - CADCAM Top Silk Screen.GBR</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_BottomSilk.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_BottomSilk.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Bottom Silk Screen.GBR">WiringBoard - CADCAM Bottom Silk Screen.GBR</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_TopResist.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_TopResist.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Top Solder Resist.GBR">WiringBoard - CADCAM Top Solder Resist.GBR</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_BottomResist.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_BottomResist.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Bottom Solder Resist.GBR">WiringBoard - CADCAM Bottom Solder Resist.GBR</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_Drill.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_Drill.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Drill.DRL">WiringBoard - CADCAM Drill.DRL</a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Thumb_Mechanical.jpg">
+                <img 
+                src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Thumb_Mechanical.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-02-12-cnc-1610-upgrade/downloads/WiringBoard - CADCAM Mechanical 1.GBR">WiringBoard - CADCAM Mechanical 1.GBR</a>
+        </td>
+    </tr>
+</table>
+
+Dado que la placa de cableado es exclusiva para la Woodpecker 3.2 muestro a continuación los planos de la placa por si el lector quisiera rediseñarla como extensión de otra máquina CNC. La configuración de esta placa es muy sencilla: la prueba de altura, los interruptores de fin de carrera y el botón de parada van directamente conectados a los puertos de extensión de la placa controladora de la CNC (Xen, Yen, Zen, A5 y RST típicamente). El resto de herramientas van conectadas a la placa principal controladas por los interruptores que vienen del panel de control en los conectores CP1 y CP2 (motor, láser, luces y botón de parada).
+
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard_Schematic.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard_Schematic.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+El diagrama de conexiones entre los componentes y la placa de cableado se muestra en el siguiente extracto del video:
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/WiringBoard.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/WiringBoard.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>
+
+### Conexión del Láser y control PWM
+
+Aunque la placa Woodpecker 3.2 dispone de un terminal de 3 pines para controlar láseres con PWM algunos tipos de laser requieren una señal de control TTL PWM que no proporciona la máquina de forma sencilla. El pulso PWM de la placa Woodpecker 3.2 se utiliza directamente para alimentar el MOSFET IRF540, encargado de controlar el motor. 
+
+Si queremos que el láser reciba esta señal de PWM debemos extraerla del pin D11 del controlador que no está expuesto en la hilera de conectores estándar (donde se encuentran los límites, sonda, reinicio, etc). El único punto donde se expone esta señal es en el terminal ICSP (utilizado para programar el micro-controlador), concretamente en el pin número 6, correspondiente al puerto MOSI. Se puede utilizar un cable _dupont_ macho para realizar una conexión entre este terminal y el láser como se muestra en la siguiente imagen:
+
+<a href="/assets/2021-02-12-cnc-1610-upgrade/PwmMosi.jpg" >
+    <img 
+        src="/assets/2021-02-12-cnc-1610-upgrade/low/PwmMosi.jpg"
+        alt="Schematic" 
+        class="center" />
+</a>

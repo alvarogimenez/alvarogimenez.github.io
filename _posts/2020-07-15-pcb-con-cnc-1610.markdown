@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "DIY: PCB con CNC 1610 y FlatCam"
-date:   2020-07-14 00:01:35 +0200
+date:   2020-07-13
 categories: electronica
 excerpt_separator: <!--more-->
 # Low quality images in /assets/2020-07-15-pcb-con-cnc-1610/low (https://bulkresizephotos.com/)
