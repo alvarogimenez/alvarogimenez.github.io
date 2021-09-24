@@ -22,7 +22,7 @@ En este artículo vamos a realizar una serie de mejoras en una CNC 1610 genéric
 
 <!--more-->
 
-### Cómo actualizar la CNC
+### Parte I: Cómo actualizar la CNC
 
 En el siguiente vídeo muestro el proceso completo de actualización de la CNC con todos los pasos a seguir. Más adelante en este artículo vamos a explorar todos los ficheros necesarios y los detalles de configuración de la máquina. 
 

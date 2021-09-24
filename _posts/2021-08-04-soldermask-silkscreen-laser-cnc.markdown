@@ -23,9 +23,9 @@ Utilizaremos el software FlatCAM para crear los programas G-Code necesarios y an
 
 <!--more-->
 
-### Parte II: Soldermask y Silkscreen con Laser y una CNC
+### Parte III: Soldermask y Silkscreen con Laser y una CNC
 
-A continuación puedes encontrar el segundo video de la serie. 
+A continuación puedes encontrar el tercer video de la serie. 
 
 <iframe class="center" width="560" height="400" style="margin-bottom:15px;" src="https://www.youtube.com/embed/NuJlgw7E7vg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 

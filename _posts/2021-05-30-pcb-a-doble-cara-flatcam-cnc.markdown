@@ -24,9 +24,9 @@ Algunos de los temas principales que trataremos incluyen, entre otros, consejos 
 
 <!--more-->
 
-### Parte I: PCB a Doble Cara con FlatCAM y Candle
+### Parte II: PCB a Doble Cara con FlatCAM y Candle
 
-A continuación puedes encontrar primer video de la serie. 
+A continuación puedes encontrar segundo video de la serie. 
 
 <iframe class="center" width="560" height="400" style="margin-bottom:15px;" src="https://www.youtube.com/embed/rDLayMgCDao" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
