@@ -57,7 +57,7 @@ El artículo que hoy traigo es sobre construcción de PCB utilizando máquinas C
       </a>
     </td>
     <td>
-  <b>Guías de sujeción:</b> Existen múltiples formas de sujetar la placa a la superficie de aluminio de la CNC. En este artículo utilizaremos las piezas de fijación que pueden obtenerse <a href="https://www.thingiverse.com/thing:2455549">aquí</a>
+  <b>Guías de sujeción:</b> Existen múltiples formas de sujetar la placa a la superficie de aluminio de la CNC. En este artículo utilizaremos las piezas de fijación que pueden obtenerse <a href="/assets/2020-07-15-pcb-con-cnc-1610/CNC_PCB_Support.zip">aquí</a>
     </td>
   </tr>
   
