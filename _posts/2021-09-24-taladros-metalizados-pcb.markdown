@@ -75,3 +75,22 @@ A continuación puedes ver la composición exacta del electrolito para cualquier
 - 10mL/L de Polisorbato 20 (Opcional)
 
 La corriente debe ser de 21.5mA/cm2 (~20ASF) y debe calcularse en base al área de cobre que queremos revestir. **Recuerda multiplicar por dos en caso de las placas a doble cara**. Con esta corriente y un tiempo de 40 minutos, deberíamos obtener una deposición de unas 20 micras. Si se reduce la corriente de electrodeposición, debemos aumentar proporcionalmente el tiempo de exposición. 
+
+### Recursos adicionales
+
+A continuación dejo los modelos 3D utilizados en este tutorial:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2021-09-24-taladros-metalizados-pcb/PCB_PTH_Support.jpg">
+                <img 
+                src="/assets/2021-09-24-taladros-metalizados-pcb/low/PCB_PTH_Support.jpg" 
+                width="200" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2021-09-24-taladros-metalizados-pcb/PCB_PTH_Support.stl">PCB_PTH_Support.stl</a>
+        </td>
+    </tr>
+</table>
