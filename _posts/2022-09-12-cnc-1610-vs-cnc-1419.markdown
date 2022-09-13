@@ -1,0 +1,140 @@
+---
+layout: post
+title:  "¿Qué CNC me compro? CNC1610 vs. CNC1419"
+date:   2022-09-12
+categories: electronica
+excerpt_separator: <!--more-->
+---
+
+<a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/main.jpg" >
+<img 
+  align="left" 
+  src="/assets/2022-09-12-cnc-1610-vs-cnc-1419/main.jpg" 
+  alt="Main" 
+  width="280"
+/>
+</a>
+
+En este nuevo video analizamos a fondo dos de las máquinas CNC de escritorio más comunes en el mercado: una CNC1610 y una CNC1419. Ambas máquinas tienen precios asequibles para el pequeño taller y pueden ser increíblemente versátiles. Veremos un análisis en profundidad de las características de estas máquinas y realizaremos un pequeño proyecto que incluye piezas de madera, acrílico, aluminio y una PCB. 
+
+En este artículo vamos a desgranar los detalles del proyecto, recopilar toda la información adicional y resolver algunas de las dudas más frecuentes sobre este tema. Aquí encontrarás los datos necesarios para poner a punto tu CNC, los ficheros 3D del proyecto que hemos realizado y los esquemas y definiciones de las PCBs de este video. 
+
+<!--more-->
+
+<iframe class="center" width="560" height="400" style="margin-bottom:15px;" src="https://www.youtube.com/embed/nJvm3iWlR0M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+## Preguntas frecuentes
+
+* **Si fabrico una PCB, ¿Qué grosor mínimo de pista puedo utilizar para cada CNC?**
+Con la CNC1419, debido a su menor juego axial, puedes producir prototipos con pistas de hasta 6 milésimas de pulgada. La CNC1610, dado que tiene un mayor juego axial, te causará problemas con pistas por debajo de las 10 milésimas de pulgada. 
+
+* **La versión de mi CNC trae incorporado un motor mejor, de 300W o 500W. ¿Obtendré mejores resultados?**
+Sin duda, cuanto mayor sea el torque del motor podrás trabajar a mayor profundidad y velocidad de corte. Especialmente en materiales duros como algunos tipos de madera o metales como el aluminio el motor de serie, el 775, se puede quedar algo corto, incrementando demasiado los tiempos de fabricación. 
+
+* **Tengo curiosidad por el mundo del mecanizado, pero no tengo experiencia con software 3D o CAD de ningún tipo, ¿Sería aconsejable comprarme una CNC aún así?**
+El mundo del mecanizado es mucho menos asequible para un usuario inexperto que el mundo de la impresión en 3D. Si bien este segundo es accesible para un usuario sin experiencia el mecanizado requiere más conocimiento y tiene una curva de aprendizaje más pronunciada. Te aconsejo documentarte previamente sobre software CAD y 3D (Como Fusion 360, por ejemplo) antes de dar el paso de comprar una CNC. 
+
+* **¿Puedo utilizar estas CNC de escritorio para producción?** 
+No. Estas máquinas CNC están pensadas para prototipar y no como herramientas para trabajar 24/7. Un estrés prolongado de sus mecanismos contribuirá a su temprano deterioro. Tanto la CNC 1419 como la CNC 1610 son ideales para el pequeño taller como herramientas de prototipado no productivo. 
+
+
+## Configuración de Fusion 360
+
+Para realizar las piezas del proyecto que se muestra en el video he utilizado las siguientes configuraciones, siempre sustituyendo la velocidad de avance en corte y la reducción de desbaste máxima (profundidad de mecanizado) por los valores seleccionados en el video durante las pruebas de rendimiento.
+
+<pre>
+  Desbaste adaptativo:
+    Avance y velocidad
+      Velocidad del Husillo:   8500 rpm
+      Vel. avance en corte:    500 mm/min (Ver video)
+      Velocidad de carga:      50 mm/min
+    Alturas
+      Altura de seguridad:     4 mm
+      Altura de retracción:    2 mm
+      Altura superior:         0 mm
+    Pasadas
+      Tolerancia:              0.01 mm
+      Carga óptima:            0.75 mm
+      Ambos sentidos:          ⨯
+      Radio de corte mínimo:   0.3 mm
+      Mecanizar cavidades:     🗸
+      Desbaste de ranuras:     ⨯
+      Dirección:               Concordante
+      Reducc. desbaste max.:   0.5 mm (Ver video)
+      Reducc. desbaste min.:   (Igual que max)
+      Detección de área plana: 🗸
+      Reducción mínima:        0.0001 mm
+      Ordenar por profundidad: ⨯
+      Ordenar por área:        🗸
+</pre>
+
+## Recursos adicionales
+
+Aquí podrás encontrar todos los recursos digitales empleados en este video. Este video está patrocinado por PCBWay. Echa un vistazo al siguiente enlace para conocer más detalles sobre el proyecto:
+
+<a href="https://www.pcbway.com/project/shareproject/Header_extension_for_500W_Spindle_3d208834.html"><img src="https://www.pcbway.com/project/img/images/frompcbway-1220.png" alt="PCB from PCBWay" /></a>
+
+A continuación puedes descargar los modelos 3D y los ficheros de diseño:
+
+<table class="center">
+    <tr>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/3d_file_body.png">
+                <img 
+                src="/assets/2022-09-12-cnc-1610-vs-cnc-1419/3d_file_body.png" 
+                width="150" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/HeadExtension_Body.stl">HeadExtension_Body.stl</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/3d_file_acrylic.png">
+                <img 
+                src="/assets/2022-09-12-cnc-1610-vs-cnc-1419/3d_file_acrylic.png" 
+                width="150" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/HeadExtension_AcrylicCover.stl">HeadExtension_AcrylicCover.stl</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/3d_file_ring.png">
+                <img 
+                src="/assets/2022-09-12-cnc-1610-vs-cnc-1419/3d_file_ring.png" 
+                width="150" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/HeadExtension_AlRing.stl">HeadExtension_AlRing.stl</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/PCB_led.png">
+                <img 
+                src="/assets/2022-09-12-cnc-1610-vs-cnc-1419/PCB_led.png" 
+                width="150" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/HeadExtensionPCB - CADCAM.ZIP">HeadExtensionPCB - CADCAM.ZIP</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/PCB_test.png">
+                <img 
+                src="/assets/2022-09-12-cnc-1610-vs-cnc-1419/PCB_test.png" 
+                width="150" />
+            </a>
+        </td>
+        <td>
+            <a href="/assets/2022-09-12-cnc-1610-vs-cnc-1419/TestPcb - CADCAM.ZIP">TestPcb - CADCAM.ZIP</a>
+        </td>
+    </tr>
+</table>
